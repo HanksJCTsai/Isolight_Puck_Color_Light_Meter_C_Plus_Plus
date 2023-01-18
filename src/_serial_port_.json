@@ -1,0 +1,1 @@
+{"Port Path": "tty.usbserial-D30C22MM", "Baud Rate": "115200", "Parity": "None", "Data Bits": "8", "Stop Bit": "1", "Time Out": 10, "Interval Time": 2, "Send CMD List": ["GRCCT","GRL","GRXYZ","GRYXY"], "Log File Name": "Log.log"}
