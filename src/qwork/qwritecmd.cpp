@@ -124,11 +124,10 @@ void QWriteCMD::writeSerialPortCMDByAuto(const QByteArray data, int intervalTime
                 serialPort->clear();
                 serialPort->write(data, data.length());
                 serialPort->flush();
-                serialPort->waitForBytesWritten(10);
+                serialPort->waitForBytesWritten(100);
               }
             time = intervalTime;
             emit sendSerialPortCMD(QString(data));
-            m_is_pause = true;
           }
         time--;
         QSleep(1 * 1000);

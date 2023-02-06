@@ -300,17 +300,17 @@ void MainWindow::addConfig(QString configPath){
       }
 }
 
-bool MainWindow::writeConfigFromIniPage(QString jsonPath, QString portPath, QString baudRate, QString dataBits, QString parityPath, QString stopBit, qint32 intervalTime, QString sendCMDList){
+bool MainWindow::writeConfigFromIniPage(QString jsonPath, QString portpath, QString baudrate, QString databit, QString paritypath, QString stopbit, qint32 intervaltime, QString sendCMDList){
   bool result =false;
   QJsonObject rootObj;
   //{"Port Path": "tty.usbserial-D30C22MM", "Baud Rate": "115200", "Parity": "None", "Data Bits": "8", "Stop Bit": "1", "Time Out": 10, "Interval Time": 2, "Send CMD List": ["GRCCT","GRL","GRXYZ","GRYXY"], "Log File Name": "Log.log"}
-  rootObj.insert("Port Path", portPath);
-  rootObj.insert("Baud Rate", baudRate);
-  rootObj.insert("Parity", parityPath);
-  rootObj.insert("Data Bits", dataBits);
-  rootObj.insert("Stop Bit", stopBit);
+  rootObj.insert("Port Path", portpath);
+  rootObj.insert("Baud Rate", baudrate);
+  rootObj.insert("Parity", paritypath);
+  rootObj.insert("Data Bits", databit);
+  rootObj.insert("Stop Bit", stopbit);
   rootObj.insert("Time Out", 0);
-  rootObj.insert("Interval Time", intervalTime);
+  rootObj.insert("Interval Time", intervaltime);
   QJsonArray intervalTimeArray;
   foreach(QString cmd, (sendCMDList).split(",")){
     if(cmd != "") {
@@ -472,24 +472,30 @@ void MainWindow::onSaveClicked(){
 }
 
 void MainWindow::onPlayClicked(){
-  if(threadWrite == NULL){
-      threadWrite = new QThread();
-    }
-  serialPortWrite->m_is_pause = false;
-  serialPortWrite->moveToThread(threadWrite);
-  threadWrite->start();
-  emit mainToThreadOpenPort(comBoBoxSerialPortList->currentText(), comBoBoxBaudRateList->currentText().toInt(), comBoBoxDataBitList->currentText().toInt(), comBoBoxParityList->currentText(), comBoBoxStopBitList->currentText().toDouble());
+  try {
+    if(threadWrite == NULL){
+        threadWrite = new QThread();
+      }
+    serialPortWrite->m_is_pause = false;
+    serialPortWrite->moveToThread(threadWrite);
+    threadWrite->start();
+    emit mainToThreadOpenPort(comBoBoxSerialPortList->currentText(), comBoBoxBaudRateList->currentText().toInt(), comBoBoxDataBitList->currentText().toInt(), comBoBoxParityList->currentText(), comBoBoxStopBitList->currentText().toDouble());
 
-  // QString autoCMD = "GRCCT\rGRL\rGRXYZ\rGRYXY\r";
-  QString autoCMD = singleCMDList.join("\r");
-  QByteArray byteArrayAutoCMD = autoCMD.toLatin1();
-  emit mainToThreadAutoWrite(byteArrayAutoCMD.data(), intervalTime);
+    //QString autoCMD = "GRCCT\rGRL\rGRXYZ\rGRYXY\r";
+    QString autoCMD = singleCMDList.join('\r');
+    autoCMD = autoCMD.append('\r');
+    QByteArray byteArrayAutoCMD = autoCMD.toLatin1();
+    emit mainToThreadAutoWrite(byteArrayAutoCMD.data(), intervalTime);
 
-  buttonTestConnect->setEnabled(false);
-  buttonPlay->setEnabled(false);
-  buttonPause->setEnabled(true);
-  buttonStop->setEnabled(false);
-  this->refreshPlainTextEdit(plainTextEditThreadStatus, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ": Do to play." );
+    buttonTestConnect->setEnabled(false);
+    buttonPlay->setEnabled(false);
+    buttonPause->setEnabled(true);
+    buttonStop->setEnabled(false);
+    this->refreshPlainTextEdit(plainTextEditThreadStatus, QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") + ": Do to play." );
+  }
+  catch (std::exception &e) {
+    qDebug() << QString(QChar::fromLatin1(*e.what()));
+   }
 }
 
 void MainWindow::onPauseClicked(){
@@ -579,7 +585,7 @@ void MainWindow::threadToMainSendCMDLog(QString sendedCMD){
 }
 
 void MainWindow::closeEvent (QCloseEvent *event){
-  QMessageBox::StandardButton buttonResult = QMessageBox::question(this, "Meter Tools", tr("Are ypu sure?\n"),  QMessageBox::Cancel |QMessageBox::No |QMessageBox::Yes, QMessageBox::Yes);
+  QMessageBox::StandardButton buttonResult = QMessageBox::question(this, "Meter Tools", tr("Are you sure?\n"),  QMessageBox::Cancel |QMessageBox::No |QMessageBox::Yes, QMessageBox::Yes);
   if (buttonResult != QMessageBox::Yes){
       event->ignore();
     } else {
