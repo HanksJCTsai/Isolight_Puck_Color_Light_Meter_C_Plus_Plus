@@ -473,11 +473,14 @@ void MainWindow::onSaveClicked(){
 
 void MainWindow::onPlayClicked(){
   try {
-    if(threadWrite == NULL){
-        threadWrite = new QThread();
-      }
+//    if(threadWrite == NULL){
+//        threadWrite = new QThread();
+//    }
     serialPortWrite->m_is_pause = false;
-    serialPortWrite->moveToThread(threadWrite);
+    if (serialPortWrite->m_is_initial) {
+        serialPortWrite->moveToThread(threadWrite);
+        serialPortWrite->m_is_initial = false;
+      }
     threadWrite->start();
     emit mainToThreadOpenPort(comBoBoxSerialPortList->currentText(), comBoBoxBaudRateList->currentText().toInt(), comBoBoxDataBitList->currentText().toInt(), comBoBoxParityList->currentText(), comBoBoxStopBitList->currentText().toDouble());
 
@@ -508,8 +511,7 @@ void MainWindow::onPauseClicked(){
 }
 
 void MainWindow::onStopClicked(){
-  threadWrite->quit();
-  threadWrite->wait();
+  serialPortWrite->m_is_pause = true;
   buttonTestConnect->setEnabled(true);
   buttonPlay->setEnabled(true);
   buttonPause->setEnabled(false);

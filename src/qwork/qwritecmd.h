@@ -23,6 +23,7 @@ public:
 
 
   bool m_is_pause = false;
+  bool m_is_initial = true;
   void QSleep(int msec);
 
 signals:
